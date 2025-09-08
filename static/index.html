@@ -1475,7 +1475,7 @@
         const saved = saveLocalMessage(currentSessionId, "bot", botResponse);
         appendBubble("bot", botResponse, { typing: true, id: saved.local_id });
 
-    } catch (error) {
+    }   catch (error) {
         console.error("Error sending message:", error);
         placeholder.remove();
         const errorResponse = "عذراً، حدث خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.";

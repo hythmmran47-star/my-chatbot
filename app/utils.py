@@ -83,9 +83,15 @@
 import os
 import google.generativeai as genai
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
+
 
 # ---------- إعدادات ----------
-API_KEY = "AIzaSyBboZ9q_BqfWB1yCGKSim9Fm9Au_NB6XKw"
+
 
 # --- system prompt ---
 SYSTEM_PROMPT = """
@@ -149,7 +155,7 @@ def call_gemini(user_message: str, system_prompt: str = SYSTEM_PROMPT, history=N
     استدعاء Gemini للرد على رسالة المستخدم مع أخذ المحادثات السابقة بالحسبان.
     """
     if not API_KEY:
-        return "[خطأ: لم يتم ضبط المفتاح داخل utils.py]"
+        raise ValueError("API_KEY not found in environment variables.")
 
     try:
         # تهيئة المكتبة بالمفتاح
@@ -191,40 +197,4 @@ def call_gemini(user_message: str, system_prompt: str = SYSTEM_PROMPT, history=N
 
     except Exception as e:
         return f"خطاء في اتصالك بالأنترنت تأكد انك متصل ثم اعد المحاولة: {str(e)}"
-#-------------------------------------------------
-#-----------------------------------
-# # utils.py
-# import google.generativeai as genai
-# from datetime import datetime
-# # # تأكد أن لديك مفتاحك هنا
-#
-# genai.configure(api_key=API_KEY)
-#
-# def call_gemini(user_message: str, session_history=None) -> str:
-#     """
-#     استدعاء Gemini للرد على رسالة المستخدم مع أخذ المحادثات السابقة بالحسبان.
-#     session_history: قائمة رسائل سابقة من DB [{sender, content}]
-#     """
-#     try:
-#         messages = []
-#
-#         # أضف رسائل الجلسة السابقة
-#         if session_history:
-#             for m in session_history:
-#                 role = "assistant" if m["sender"] == "bot" else "user"
-#                 messages.append({"role": role, "content": m["content"]})
-#
-#         # أضف رسالة المستخدم الحالية
-#         messages.append({"role": "user", "content": user_message})
-#
-#         # استدعاء النموذج
-#         chat = genai.chat.create(
-#             model="gemini-1.5-flash",
-#             messages=messages
-#         )
-#
-#         answer = chat.last
-#         return answer
-#
-#     except Exception as e:
-#         return f"خطاء في الاتصال: {str(e)}"
+
