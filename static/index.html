@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🩺 المساعد الطبي الذكي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0066cc;
+            --primary-blue-dark: #004499;
+            --primary-blue-light: #3388ff;
+            --medical-green: #00a86b;
+            --medical-green-dark: #008855;
+            --accent-teal: #20b2aa;
+            --accent-orange: #ff6b35;
+            --text-dark: #1a1a1a;
+            --text-medium: #4a4a4a;
+            --text-light: #7a7a7a;
+            --bg-white: #ffffff;
+            --bg-light: #f8fafc;
+            --bg-lighter: #f1f5f9;
+            --border-light: #e2e8f0;
+            --border-medium: #cbd5e1;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        [data-theme="dark"] {
+            --text-dark: #ffffff;
+            --text-medium: #e2e8f0;
+            --text-light: #94a3b8;
+            --bg-white: #1e293b;
+            --bg-light: #0f172a;
+            --bg-lighter: #334155;
+            --border-light: #475569;
+            --border-medium: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #00b894, #74b9ff, #a29bfe);
+            background-size: 400% 400%;
+            animation: gradientFlow 15s ease infinite;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="medical-pattern" patternUnits="userSpaceOnUse" width="40" height="40"><circle cx="20" cy="20" r="2" fill="white" opacity="0.1"><animate attributeName="opacity" values="0.1;0.3;0.1" dur="4s" repeatCount="indefinite"/></circle><path d="M15 20h10M20 15v10" stroke="white" stroke-width="0.5" opacity="0.05"><animate attributeName="opacity" values="0.05;0.15;0.05" dur="6s" repeatCount="indefinite"/></path></pattern></defs><rect width="100" height="100" fill="url(%23medical-pattern)"/></svg>');
+            animation: medicalFloat 20s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 184, 148, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(116, 185, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(162, 155, 254, 0.15) 0%, transparent 50%);
+            animation: particleFloat 25s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes medicalFloat {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(-40px) translateY(-40px); }
+        }
+
+        @keyframes particleFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(15px) rotate(240deg); }
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Sidebar - مستوحى من تصميم Mayo Clinic */
+        .sidebar {
+            width: 380px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(100%);
+        }
+
+        .sidebar-header {
+            padding: 32px 24px 24px;
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.9) 0%, rgba(0, 168, 107, 0.9) 100%);
+            backdrop-filter: blur(15px);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="medical" patternUnits="userSpaceOnUse" width="20" height="20"><circle cx="10" cy="10" r="1" fill="white" opacity="0.15"><animate attributeName="opacity" values="0.1;0.3;0.1" dur="3s" repeatCount="indefinite"/></circle><path d="M7 10h6M10 7v6" stroke="white" stroke-width="0.5" opacity="0.1"><animate attributeName="opacity" values="0.05;0.2;0.05" dur="4s" repeatCount="indefinite"/></path></pattern></defs><rect width="100" height="100" fill="url(%23medical)"/></svg>');
+            animation: medicalHeaderFloat 25s linear infinite;
+        }
+
+        .sidebar-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes medicalHeaderFloat {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            100% { transform: translateX(-20px) translateY(-20px) rotate(360deg); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes float {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(-20px) translateY(-20px); }
+        }
+
+        /* Floating Medical Particles */
+        .app-container::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><g id="particle"><circle cx="5" cy="5" r="1" fill="white" opacity="0.6"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite"/></circle></g></defs><use href="%23particle" x="20" y="30"><animateTransform attributeName="transform" type="translate" values="0,0; 10,-20; 0,0" dur="8s" repeatCount="indefinite"/></use><use href="%23particle" x="150" y="50"><animateTransform attributeName="transform" type="translate" values="0,0; -15,25; 0,0" dur="12s" repeatCount="indefinite"/></use><use href="%23particle" x="80" y="120"><animateTransform attributeName="transform" type="translate" values="0,0; 20,-10; 0,0" dur="10s" repeatCount="indefinite"/></use><use href="%23particle" x="180" y="160"><animateTransform attributeName="transform" type="translate" values="0,0; -25,15; 0,0" dur="14s" repeatCount="indefinite"/></use></svg>');
+            animation: particlesDrift 30s linear infinite;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        @keyframes particlesDrift {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(-200px) translateY(-200px); }
+        }
+
+        .logo-section {
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.25);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            animation: logoFloat 4s ease-in-out infinite;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), transparent, rgba(255, 255, 255, 0.3));
+            animation: logoRotate 3s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-8px) scale(1.05); }
+        }
+
+        @keyframes logoRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .sidebar-controls {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .control-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--medical-green));
+            color: white;
+            flex: 1;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--bg-lighter);
+            color: var(--text-medium);
+            border: 1px solid var(--border-light);
+            padding: 14px;
+            min-width: 48px;
+            justify-content: center;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-light);
+            transform: translateY(-1px);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            background: var(--bg-lighter);
+            color: var(--text-dark);
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: var(--bg-white);
+            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .sessions-header {
+            padding: 0 24px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sessions-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .sessions-count {
+            background: var(--primary-blue);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .sessions-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 24px 24px;
+        }
+
+        .session-item {
+            margin-bottom: 12px;
+            padding: 20px;
+            background: var(--bg-white);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .session-item:hover {
+            border-color: var(--primary-blue);
+            transform: translateX(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .session-item.active {
+            border-color: var(--primary-blue);
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.05), rgba(0, 168, 107, 0.05));
+            box-shadow: var(--shadow-md);
+        }
+
+        .session-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .session-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-dark);
+            line-height: 1.4;
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .session-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .session-item:hover .session-actions {
+            opacity: 1;
+        }
+
+        .session-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .session-btn.open {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .session-btn.delete {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .session-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .session-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .session-date {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .session-messages {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .session-preview {
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--bg-lighter);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-medium);
+            line-height: 1.4;
+            border-right: 3px solid var(--accent-teal);
+        }
+
+        /* Main Chat Area - مستوحى من WebMD */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            border-radius: 24px 0 0 24px;
+            margin: 12px 0 12px 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .chat-header {
+            padding: 24px 32px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .chat-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: headerShimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes headerShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--medical-green));
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            position: relative;
+            animation: avatarPulse 3s ease-in-out infinite;
+            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
+        }
+
+        .header-avatar::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(0, 102, 204, 0.3), transparent, rgba(0, 168, 107, 0.3));
+            animation: avatarRotate 4s linear infinite;
+            z-index: -1;
+        }
+
+        .header-avatar::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border: 2px solid white;
+            border-radius: 50%;
+            transform: translate(12px, 12px);
+            animation: statusBlink 2s ease-in-out infinite;
+        }
+
+        @keyframes avatarPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes avatarRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes statusBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .header-text h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            background: rgba(248, 250, 252, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .chat-feed::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(0, 184, 148, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(116, 185, 255, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            animation: feedFloat 30s ease-in-out infinite;
+        }
+
+        @keyframes feedFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .message {
+            max-width: 70%;
+            position: relative;
+            animation: messageSlide 0.5s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message-bubble {
+            padding: 20px 24px;
+            border-radius: var(--radius-xl);
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(15px);
+            overflow: hidden;
+        }
+
+        .message-bubble::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .message-bubble:hover::before {
+            left: 100%;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.9), rgba(51, 136, 255, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-bottom-right-radius: var(--radius-sm);
+            box-shadow: 0 8px 32px rgba(0, 102, 204, 0.3);
+        }
+
+        .message.bot .message-bubble {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-dark);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom-left-radius: var(--radius-sm);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-bubble:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .message-content {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 8px;
+            text-align: left;
+        }
+
+        .message.user .message-time {
+            text-align: right;
+        }
+
+        .message-tools {
+            position: absolute;
+            top: -40px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            background: var(--bg-white);
+            padding: 8px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+        }
+
+        .message:hover .message-tools {
+            opacity: 1;
+            transform: translateY(-5px);
+        }
+
+        .tool-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: var(--bg-lighter);
+            color: var(--text-medium);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .tool-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .input-section {
+            padding: 24px 32px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .input-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-xl);
+            padding: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .input-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 102, 204, 0.1), transparent);
+            transition: left 0.3s ease;
+        }
+
+        .input-container:focus-within {
+            border-color: rgba(0, 102, 204, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .input-container:focus-within::before {
+            left: 0;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-msg {
+            width: 100%;
+            min-height: 24px;
+            max-height: 120px;
+            padding: 16px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-dark);
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .input-msg::placeholder {
+            color: var(--text-light);
+        }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--medical-green));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .send-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 8px 32px rgba(0, 102, 204, 0.6);
+        }
+
+        .send-btn:hover:not(:disabled)::before {
+            width: 60px;
+            height: 60px;
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .jump-btn {
+            position: absolute;
+            bottom: 120px;
+            right: 32px;
+            width: 48px;
+            height: 48px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .jump-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .jump-btn.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            animation: typingBounce 1.4s ease-in-out infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                z-index: 1000;
+                transform: translateX(100%);
+            }
+
+            .sidebar:not(.hidden) {
+                transform: translateX(0);
+            }
+
+            .chat-feed {
+                padding: 20px;
+            }
+
+            .input-section {
+                padding: 16px 20px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+        }
+
+        /* Scrollbar Styling */
+        .sessions-container::-webkit-scrollbar,
+        .chat-feed::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sessions-container::-webkit-scrollbar-track,
+        .chat-feed::-webkit-scrollbar-track {
+            background: var(--bg-lighter);
+            border-radius: 3px;
+        }
+
+        .sessions-container::-webkit-scrollbar-thumb,
+        .chat-feed::-webkit-scrollbar-thumb {
+            background: var(--border-medium);
+            border-radius: 3px;
+        }
+
+        .sessions-container::-webkit-scrollbar-thumb:hover,
+        .chat-feed::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-blue);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h1 class="sidebar-title">المساعد الطبي الذكي</h1>
+                    <p class="sidebar-subtitle">مساعدك الشخصي للاستشارات الطبية</p>
+                </div>
+            </div>
+
+            <div class="sidebar-controls">
+                <div class="control-group">
+                    <button class="btn btn-primary" id="btnNewSession">
+                        <i class="fas fa-plus"></i>
+                        محادثة جديدة
+                    </button>
+                    <button class="btn btn-secondary" id="btnToggleTheme" title="تغيير المظهر">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchSessions" placeholder="ابحث في المحادثات...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+
+            <div class="sessions-header">
+                <h3 class="sessions-title">المحادثات السابقة</h3>
+                <span class="sessions-count" id="sessionsCount">0</span>
+            </div>
+
+            <div class="sessions-container">
+                <div id="sessionsList"></div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="main-content">
+            <header class="chat-header">
+                <div class="header-info">
+                    <div class="header-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1 id="chatTitle">المساعد الطبي الذكي</h1>
+                        <p id="chatSubtitle">جاهز للإجابة على استفساراتك الطبية</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="btnShareSession" title="مشاركة المحادثة">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <button class="btn btn-secondary" id="btnToggleSidebar" title="إظهار/إخفاء القائمة">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="chat-feed" id="chatFeed"></div>
+
+            <button class="jump-btn hidden" id="jumpBtn">
+                <i class="fas fa-arrow-down"></i>
+            </button>
+
+            <div class="input-section">
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <textarea class="input-msg" id="inputMsg" 
+                            placeholder="اكتب سؤالك الطبي هنا... (Shift+Enter لسطر جديد)" 
+                            rows="1"></textarea>
+                    </div>
+                    <button class="send-btn" id="sendBtn" title="إرسال الرسالة">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        (() => {
+            // ---- إعدادات عامة ----
+            const USER_ID = "student1";
+            const SESS_KEY = "cb_sessions_v2";
+            const THEME_KEY = "cb_theme_v2";
+
+            // عناصر DOM
+            const sessionsList = document.getElementById("sessionsList");
+            const sessionsCount = document.getElementById("sessionsCount");
+            const searchSessions = document.getElementById("searchSessions");
+            const btnNewSession = document.getElementById("btnNewSession");
+            const btnToggleTheme = document.getElementById("btnToggleTheme");
+            const btnToggleSidebar = document.getElementById("btnToggleSidebar");
+            const btnShareSession = document.getElementById("btnShareSession");
+            const chatFeed = document.getElementById("chatFeed");
+            const inputMsg = document.getElementById("inputMsg");
+            const sendBtn = document.getElementById("sendBtn");
+            const jumpBtn = document.getElementById("jumpBtn");
+            const sidebar = document.getElementById("sidebar");
+            const chatTitle = document.getElementById("chatTitle");
+            const chatSubtitle = document.getElementById("chatSubtitle");
+
+            // حالة
+            let currentSessionId = null;
+            let sessions = {};
+            let userScrolledAway = false;
+
+            // ---- helpers localStorage ----
+            function loadSessions() {
+                try { return JSON.parse(localStorage.getItem(SESS_KEY) || "{}"); }
+                catch (e) { console.warn(e); return {}; }
+            }
+            function saveSessions() { localStorage.setItem(SESS_KEY, JSON.stringify(sessions)); }
+
+            // ---- تنسيقات HTML ----
+            function escapeHtml(s) {
+                return s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+            }
+           function formatToHtml(text) {
+                if (!text) return "";
+                return text; // اسمح بعرض HTML جاهز من السيرفر
+            }
+
+
+
+            // ---- typing effect ----
+            function typeWrite(element, html, speed = 20, onDone) {
+                element.innerHTML = "";
+                let i = 0;
+                function step() {
+                    if (i < html.length) {
+                        element.innerHTML += html.charAt(i);
+                        i++;
+                        if (!userScrolledAway) chatFeed.scrollTop = chatFeed.scrollHeight;
+                        setTimeout(step, speed);
+                    } else if (onDone) onDone();
+                }
+                step();
+            }
+            // ---- typing effect ----
+            function typeWrite(element, html, speed = 20, onDone) {
+                element.innerHTML = "";
+                let i = 0;
+                function step() {
+                    if (i < html.length) {
+                        element.innerHTML += html.charAt(i);
+                        i++;
+                        if (!userScrolledAway) chatFeed.scrollTop = chatFeed.scrollHeight;
+                        setTimeout(step, speed);
+                    } else if (onDone) onDone();
+                }
+                step();
+            }
+
+            // ---- UI: فقاعات الرسائل ----
+            function appendBubble(sender, textPlain, opts = {}) {
+                const { typing = false, id = null } = opts;
+                const wrapper = document.createElement("div");
+                wrapper.className = "message " + (sender === "user" ? "user" : "bot");
+                wrapper.dataset.id = id || String(Date.now());
+
+                const bubble = document.createElement("div");
+                bubble.className = "message-bubble";
+
+                const content = document.createElement("div");
+                content.className = "message-content";
+
+                const timeDiv = document.createElement("div");
+                timeDiv.className = "message-time";
+                timeDiv.textContent = new Date().toLocaleTimeString('ar-EG', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+
+                const html = formatToHtml(textPlain);
+
+                if (typing && sender === "bot") {
+                    const typingDiv = document.createElement("div");
+                    typingDiv.className = "typing-indicator";
+                    typingDiv.innerHTML = `
+                        <span>جارٍ الكتابة</span>
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    `;
+                    content.appendChild(typingDiv);
+
+                    setTimeout(() => {
+                        content.innerHTML = "";
+                        typeWrite(content, html, 20);
+                    }, 1500 + Math.random() * 1000);
+                } else {
+                    content.innerHTML = html;
+                }
+
+                bubble.appendChild(content);
+                bubble.appendChild(timeDiv);
+
+                // أدوات التحكم
+                const tools = document.createElement("div");
+                tools.className = "message-tools";
+
+                if (sender === "user") {
+                    const editBtn = document.createElement("button");
+                    editBtn.className = "tool-btn";
+                    editBtn.title = "تعديل";
+                    editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+                    editBtn.onclick = (e) => { e.stopPropagation(); editUserMessage(wrapper); };
+                    tools.appendChild(editBtn);
+                }
+
+                const copyBtn = document.createElement("button");
+                copyBtn.className = "tool-btn";
+                copyBtn.title = "نسخ";
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.onclick = (e) => { e.stopPropagation(); copyMsg(wrapper); };
+                tools.appendChild(copyBtn);
+
+                wrapper.appendChild(bubble);
+                wrapper.appendChild(tools);
+                chatFeed.appendChild(wrapper);
+
+                const atBottom = chatFeed.scrollTop + chatFeed.clientHeight >= chatFeed.scrollHeight - 100;
+                if (atBottom) { 
+                    chatFeed.scrollTop = chatFeed.scrollHeight; 
+                    hideJump(); 
+                } else { 
+                    showJump(); 
+                }
+
+                return wrapper;
+            }
+
+            function showJump() { jumpBtn.classList.remove("hidden"); }
+            function hideJump() { jumpBtn.classList.add("hidden"); }
+
+            function copyMsg(wrapper) {
+                const txt = wrapper.querySelector(".message-content").innerText || "";
+                navigator.clipboard?.writeText(txt).then(() => alert("تم النسخ")).catch(() => alert("فشل النسخ"));
+            }
+
+            function editUserMessage(wrapper) {
+                const cur = wrapper.querySelector(".message-content").innerText || "";
+                const newVal = prompt("عدل رسالتك:", cur);
+                if (!newVal) return;
+                wrapper.querySelector(".message-content").innerHTML = formatToHtml(newVal);
+                const sid = currentSessionId;
+                if (sid && sessions[sid]) {
+                    const msg = sessions[sid].messages.find(m => String(m.local_id) === String(wrapper.dataset.id));
+                    if (msg && msg.sender === "user") {
+                        msg.content = newVal;
+                        msg.updated_at = new Date().toISOString();
+                        saveSessions();
+                        rebuildSessionsList();
+                    }
+                }
+            }
+
+            // ---- قائمة الجلسات ----
+            function rebuildSessionsList(filter = "") {
+                sessionsList.innerHTML = "";
+                const arr = Object.values(sessions).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                
+                let filteredSessions = arr;
+                if (filter) {
+                    filteredSessions = arr.filter(s => {
+                        const title = s.name && s.name.trim() ? s.name : (s.messages && s.messages[0] ? excerpt(s.messages[0].content, 35) : "محادثة جديدة");
+                        return title.toLowerCase().includes(filter.toLowerCase());
+                    });
+                }
+
+                sessionsCount.textContent = filteredSessions.length;
+
+                filteredSessions.forEach(s => {
+                    const title = s.name && s.name.trim() ? s.name : (s.messages && s.messages[0] ? excerpt(s.messages[0].content, 35) : "محادثة جديدة");
+                    const lastMessage = s.messages && s.messages.length > 0 ? s.messages[s.messages.length - 1] : null;
+                    const preview = lastMessage ? excerpt(lastMessage.content, 60) : "لا توجد رسائل";
+                    
+                    const el = document.createElement("div");
+                    el.className = "session-item";
+                    if (s.id === currentSessionId) el.classList.add("active");
+                    
+                    el.innerHTML = `
+                        <div class="session-header">
+                            <div class="session-title">${escapeHtml(title)}</div>
+                            <div class="session-actions">
+                                <button class="session-btn open" title="فتح المحادثة">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <button class="session-btn delete" title="حذف">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="session-meta">
+                            <div class="session-date">
+                                <i class="fas fa-clock"></i>
+                                ${new Date(s.created_at).toLocaleDateString('ar-EG')}
+                            </div>
+                            <div class="session-messages">
+                                <i class="fas fa-comments"></i>
+                                ${s.messages ? s.messages.length : 0} رسالة
+                            </div>
+                        </div>
+                        <div class="session-preview">${escapeHtml(preview)}</div>
+                    `;
+
+                    const openBtn = el.querySelector('.session-btn.open');
+                    const deleteBtn = el.querySelector('.session-btn.delete');
+
+                    openBtn.onclick = (e) => { e.stopPropagation(); openSession(s.id); };
+                    deleteBtn.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        if (confirm("هل تريد حذف هذه المحادثة؟")) { 
+                            delete sessions[s.id]; 
+                            saveSessions(); 
+                            rebuildSessionsList(searchSessions.value); 
+                            if (s.id === currentSessionId) { 
+                                currentSessionId = null; 
+                                clearChat(); 
+                                chatTitle.textContent = "المساعد الطبي الذكي";
+                                chatSubtitle.textContent = "جاهز للإجابة على استفساراتك الطبية";
+                            } 
+                        } 
+                    };
+
+                    el.onclick = () => openSession(s.id);
+                    sessionsList.appendChild(el);
+                });
+            }
+
+            function excerpt(text, n = 35) {
+                if (!text) return "محادثة جديدة";
+                const t = text.replace(/\s+/g, ' ').trim();
+                return t.length <= n ? t : t.slice(0, n) + "...";
+            }
+
+            async function openSession(sessionId) {
+                currentSessionId = String(sessionId);
+                const s = sessions[currentSessionId];
+                if (!s) return;
+                
+                const title = s.name && s.name.trim() ? s.name : "محادثة طبية";
+                chatTitle.textContent = title;
+                chatSubtitle.textContent = `بدأت في ${new Date(s.created_at).toLocaleDateString('ar-EG')}`;
+                
+                clearChat();
+                if (s.messages) {
+                    s.messages.forEach(m => {
+                        appendBubble(m.sender, m.content, { typing: false, id: m.local_id });
+                    });
+                }
+                rebuildSessionsList(searchSessions.value);
+            }
+
+            function clearChat() { chatFeed.innerHTML = ""; }
+
+            function createNewSession() {
+                const id = String(Date.now());
+                sessions[id] = { 
+                    id, 
+                    name: "", 
+                    created_at: new Date().toISOString(), 
+                    messages: [] 
+                };
+                saveSessions(); 
+                rebuildSessionsList();
+                openSession(id);
+            }
+
+            function saveLocalMessage(sessionId, sender, content, serverMessageId = null) {
+                if (!sessions[sessionId]) {
+                    sessions[sessionId] = { 
+                        id: sessionId, 
+                        name: "", 
+                        created_at: new Date().toISOString(), 
+                        messages: [] 
+                    };
+                }
+                
+                const localId = serverMessageId || String(Date.now()) + Math.floor(Math.random() * 1000);
+                const msgObj = { 
+                    local_id: localId, 
+                    sender, 
+                    content, 
+                    created_at: new Date().toISOString() 
+                };
+                
+                const isFirst = !sessions[sessionId].messages || sessions[sessionId].messages.length === 0;
+                        if (isFirst && (!sessions[sessionId].name || sessions[sessionId].name === "")) {
+                      sessions[sessionId].name = excerpt(content, 40);
+                    }
+
+                sessions[sessionId].messages.push(msgObj);
+                saveSessions(); 
+                rebuildSessionsList(searchSessions.value);
+                return msgObj;
+            }
+
+            async function sendMessage() {
+    const text = inputMsg.value.trim();
+    if (!text) return;
+
+    // إنشاء جلسة جديدة إذا لم توجد جلسة حالية
+    if (!currentSessionId) createNewSession();
+
+    // حفظ رسالة المستخدم محلياً وعرضها
+    const localMsg = saveLocalMessage(currentSessionId, "user", text);
+    appendBubble("user", text, { typing: false, id: localMsg.local_id });
+    inputMsg.value = ""; 
+    inputMsg.style.height = "auto";
+
+    // فقرة مؤقتة للكتابة
+    const placeholder = appendBubble("bot", "", { typing: true, id: "ph_" + Date.now() });
+
+    try {
+        // إرسال الرسالة للباك اند
+        const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                session_id: currentSessionId,
+                message: text
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // إزالة فقرة الكتابة المؤقتة
+        placeholder.remove();
+
+        // استخدم الحقل الصحيح من رد السيرفر
+        const botResponse = data.reply || "عذراً، حدث خطأ في الاستجابة.";
+        const saved = saveLocalMessage(currentSessionId, "bot", botResponse);
+        appendBubble("bot", botResponse, { typing: true, id: saved.local_id });
+
+    } catch (error) {
+        console.error("Error sending message:", error);
+        placeholder.remove();
+        const errorResponse = "عذراً، حدث خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.";
+        const saved = saveLocalMessage(currentSessionId, "bot", errorResponse);
+        appendBubble("bot", errorResponse, { typing: true, id: saved.local_id });
+    }
+}
+
+
+            function generateMedicalResponse(userMessage) {
+                const responses = [
+                    "شكراً لسؤالك الطبي. بناءً على ما ذكرت، أنصحك بمراجعة طبيب مختص للحصول على تشخيص دقيق. في الوقت نفسه، يمكنك اتباع هذه النصائح العامة...",
+                    "هذا سؤال مهم جداً. من المعلومات الطبية المتاحة، يمكنني أن أخبرك أن هذه الأعراض قد تكون مرتبطة بعدة حالات. أنصحك بشدة بمراجعة طبيب مختص...",
+                    "أقدر اهتمامك بصحتك. بناءً على الأدبيات الطبية، هناك عدة عوامل يجب مراعاتها. أولاً، من المهم جداً استشارة طبيب مختص. ثانياً، يمكنك اتباع هذه الإرشادات الوقائية...",
+                    "سؤال ممتاز! من الناحية الطبية، هذه الحالة تتطلب تقييماً شاملاً. أنصحك بمراجعة الطبيب المختص في أقرب وقت ممكن. في الوقت نفسه، إليك بعض المعلومات المفيدة...",
+                    "شكراً لثقتك. هذا الموضوع يحتاج إلى اهتمام طبي متخصص. من المهم جداً عدم تأخير زيارة الطبيب. إليك بعض النصائح العامة التي قد تساعدك..."
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+
+            // ---- events ----
+            sendBtn.addEventListener("click", sendMessage);
+            inputMsg.addEventListener("keydown", e => {
+                if (e.key === "Enter" && !e.shiftKey) { 
+                    e.preventDefault(); 
+                    sendMessage(); 
+                }
+            });
+
+            btnNewSession.addEventListener("click", () => createNewSession());
+            btnToggleTheme.addEventListener("click", toggleTheme);
+            btnToggleSidebar.addEventListener("click", () => sidebar.classList.toggle("hidden"));
+            btnShareSession.addEventListener("click", shareCurrentSession);
+
+            jumpBtn.addEventListener("click", () => { 
+                chatFeed.scrollTop = chatFeed.scrollHeight; 
+                hideJump(); 
+            });
+
+            chatFeed.addEventListener("scroll", () => {
+                const atBottom = chatFeed.scrollTop + chatFeed.clientHeight >= chatFeed.scrollHeight - 120;
+                userScrolledAway = !atBottom;
+                if (atBottom) hideJump();
+                else showJump();
+            });
+
+            searchSessions.addEventListener("input", (e) => rebuildSessionsList(e.target.value));
+
+            // ---- theme ----
+            function loadTheme() {
+                const t = localStorage.getItem(THEME_KEY) || "light";
+                document.documentElement.setAttribute("data-theme", t);
+                const themeIcon = btnToggleTheme.querySelector('i');
+                if (t === "dark") {
+                    document.documentElement.classList.add("dark");
+                    themeIcon.className = "fas fa-sun";
+                } else {
+                    document.documentElement.classList.remove("dark");
+                    themeIcon.className = "fas fa-moon";
+                }
+            }
+
+            function toggleTheme() {
+                const cur = document.documentElement.getAttribute("data-theme") || "light";
+                const next = cur === "light" ? "dark" : "light";
+                document.documentElement.setAttribute("data-theme", next);
+                const themeIcon = btnToggleTheme.querySelector('i');
+                
+                if (next === "dark") {
+                    document.documentElement.classList.add("dark");
+                    themeIcon.className = "fas fa-sun";
+                } else {
+                    document.documentElement.classList.remove("dark");
+                    themeIcon.className = "fas fa-moon";
+                }
+                localStorage.setItem(THEME_KEY, next);
+            }
+
+            function shareCurrentSession() {
+                if (!currentSessionId || !sessions[currentSessionId]) {
+                    return alert("يرجى فتح محادثة للمشاركة");
+                }
+                
+                const s = sessions[currentSessionId];
+                const title = s.name || "محادثة طبية";
+                let text = `📋 ${title}\n`;
+                text += `📅 ${new Date(s.created_at).toLocaleDateString('ar-EG')}\n\n`;
+                
+                if (s.messages) {
+                    s.messages.forEach(m => {
+                        const icon = m.sender === "user" ? "👤" : "🩺";
+                        text += `${icon} ${m.content}\n\n`;
+                    });
+                }
+                
+                navigator.clipboard?.writeText(text)
+                    .then(() => alert("تم نسخ المحادثة بنجاح!"))
+                    .catch(() => prompt("انسخ المحادثة يدوياً:", text));
+            }
+
+            // ---- init ----
+            function init() {
+                sessions = loadSessions();
+                loadTheme();
+                rebuildSessionsList();
+                
+                // إنشاء جلسة جديدة إذا لم توجد جلسات
+                if (Object.keys(sessions).length === 0) {
+                    createNewSession();
+                    appendBubble("bot", "مرحباً بك في المساعد الطبي الذكي! 🩺\n\nأنا هنا لمساعدتك في الإجابة على استفساراتك الطبية وتقديم المعلومات الصحية المفيدة.\n\n**تنبيه مهم:** المعلومات المقدمة هنا لأغراض تعليمية فقط ولا تغني عن استشارة الطبيب المختص.\n\nكيف يمكنني مساعدتك اليوم؟", { typing: true });
+                }
+            }
+
+            init();
+        })();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97b90c1a4507d1e8',t:'MTc1NzI3NzkwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
+</html>

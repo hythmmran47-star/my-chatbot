@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>شات بوت طبي - الجامعة</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container-full">
+    <!-- زر القائمة الجانبية -->
+    <button id="toggleSidebar" class="toggle-sidebar">☰ سجل المحادثات</button>
+    <br><br><br>
+    <!-- قسم سجل المحادثات -->
+    <div id="sidebar" class="sidebar">
+      <h2>سجل المحادثات</h2>
+      <div id="history" class="history"></div>
+    </div>
+
+    <!-- قسم الدردشة -->
+    <div class="chat-container">
+      <header>
+        <h1>شات بوت مبدأي - تخصص الطب</h1>
+        <p class="notice">المطورين</p>
+        <p class="notice">احمد عبده احمد حزام الغيلي</p>
+        <p class="notice">هيثم يحي جابر عمران</p>
+      </header>
+
+      <div id="chatbox" class="chatbox"></div>
+
+      <div class="controls">
+        <input id="inputMsg" placeholder="اكتب سؤالك الطبي هنا..." />
+        <button id="sendBtn">إرسال</button>
+        <button id="themeBtn">🌙 / ☀️ ثيم</button>
+      </div>
+
+      <div class="session">
+        <button id="newSession">جلسة جديدة</button>
+      </div>
+    </div>
+  </div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,493 @@
+الكود التالي دالة المين باسم main.py
+# app/main.py
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
+import os, uuid
+
+# استيراد DB والنماذج
+from .db import SessionLocal, engine, Base
+from . import models, schemas, utils
+
+# إنشاء الجداول إذا لم تكن موجودة
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Chatbot Medical - Arabic")
+
+# --------------------------------------
+# ضبط مسار static الصحيح (خارج app/)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # مجلد chatbot-medical
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
+# استضافة مجلد static
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+# دالة مساعدة للحصول على Session من SQLAlchemy
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# -------------------------------
+# صفحة الواجهة
+@app.get("/", response_class=HTMLResponse)
+async def read_index():
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    with open(index_path, "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# -------------------------------
+# API: استقبال رسالة دردشة
+@app.post("/api/chat", response_model=schemas.ChatResponse)
+async def chat_endpoint(req: schemas.ChatRequest, db: Session = Depends(get_db)):
+
+    # 1) تحميل أو إنشاء جلسة
+    session = None
+    if req.session_id:
+        session = db.query(models.ChatSession).filter(models.ChatSession.id == req.session_id).first()
+
+    if not session:
+        # توليد UUID لكل جلسة جديدة
+        new_session_id = str(uuid.uuid4())
+        session = models.ChatSession(id=new_session_id, name="جلسة طالب")
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+
+    # 2) حفظ رسالة المستخدم
+    msg = models.Message(session_id=session.id, sender="user", content=req.message)
+    db.add(msg)
+    db.commit()
+    db.refresh(msg)
+
+    # 3) استدعاء Gemini (أو mock)
+    reply_text = utils.call_gemini(req.message)
+
+    # 4) حفظ رد البوت
+    bot_msg = models.Message(session_id=session.id, sender="bot", content=reply_text)
+    db.add(bot_msg)
+    db.commit()
+    db.refresh(bot_msg)
+
+    # 5) إعادة الرد مع session_id
+    return {"reply": reply_text, "message_id": bot_msg.id, "session_id": session.id}
+
+# -------------------------------
+# API: استرجاع تاريخ الجلسة
+@app.get("/api/history")
+async def get_history(session_id: str, db: Session = Depends(get_db)):
+    session = db.query(models.ChatSession).filter(models.ChatSession.id == session_id).first()
+    if not session:
+        raise HTTPException(status_code=404, detail="جلسة غير موجودة")
+    
+    msgs = (
+        db.query(models.Message)
+        .filter(models.Message.session_id == session_id)
+        .order_by(models.Message.created_at)
+        .all()
+    )
+    out = [{"id": m.id, "sender": m.sender, "content": m.content, "created_at": m.created_at.isoformat()} for m in msgs]
+    return {"session": {"id": session.id, "name": session.name}, "messages": out}
+
+# -------------------------------
+# API: استقبال تقييم / ملاحظات
+@app.post("/api/feedback")
+async def feedback_endpoint(fb: schemas.FeedbackRequest, db: Session = Depends(get_db)):
+    if fb.rating < 1 or fb.rating > 5:
+        raise HTTPException(status_code=400, detail="التقييم يجب أن يكون بين 1 و 5")
+    entry = models.Feedback(message_id=fb.message_id, rating=fb.rating, comment=fb.comment)
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return {"status": "ok", "id": entry.id}
+
+# -------------------------------
+# API: endpoint بسيط لمسح قاعدة البيانات (اختياري، للتطوير)
+@app.post("/api/admin/flush")
+async def admin_flush(password: str):
+    if password != os.getenv("ADMIN_PASSWORD", "admin123"):
+        raise HTTPException(status_code=403, detail="غير مخوّل")
+    try:
+        os.remove(os.path.join(BASE_DIR, "chatbot.db"))
+        Base.metadata.create_all(bind=engine)
+    except Exception:
+        pass
+    return {"status": "db flushed"}
+الكود التالي تبع  db.py
+# app/db.py
+# إعداد وإدارة قاعدة بيانات SQLite باستخدام SQLAlchemy
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+# هنا نستخدم ملف sqlite محلي اسمه 'chatbot.db'
+DATABASE_URL = "sqlite:///./chatbot.db"
+
+# محرك الاتصال
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+# Session لعمليات DB
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base لوراثة نماذج SQLAlchemy
+Base = declarative_base()
+
+ الكود التالي تبع models.py
+# app/models.py
+# نماذج قاعدة البيانات (Messages و Feedback و Session)
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from datetime import datetime
+from .db import Base
+
+class ChatSession(Base):
+    __tablename__ = "sessions"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), default="جلسة طالب")  # اسم الجلسة عند الحاجة
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    messages = relationship("Message", back_populates="session")
+
+class Message(Base):
+    __tablename__ = "messages"
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(Integer, ForeignKey("sessions.id"))
+    sender = Column(String(20))  # "user" أو "bot"
+    content = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    session = relationship("ChatSession", back_populates="messages")
+
+class Feedback(Base):
+    __tablename__ = "feedbacks"
+    id = Column(Integer, primary_key=True, index=True)
+    message_id = Column(Integer)  # يمكن ربطه إلى messages.id إن رغبت
+    rating = Column(Integer)      # 1..5
+    comment = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+الكود التالي تبع  schemas.py
+
+# app/schemas.py
+from pydantic import BaseModel
+from typing import Optional
+
+# -------------------------------
+# نموذج الطلب عند إرسال رسالة دردشة
+class ChatRequest(BaseModel):
+    user_id: str               # معرف المستخدم المرسل للرسالة
+    session_id: Optional[str] = None  # معرف الجلسة (اختياري لإنشاء جلسة جديدة)
+    message: str               # نص الرسالة المرسلة
+
+# -------------------------------
+# نموذج الرد من البوت
+class ChatResponse(BaseModel):
+    reply: str                 # نص الرد من البوت
+    message_id: Optional[int] = None   # معرف الرسالة المرسلة من البوت
+    session_id: Optional[str] = None   # معرف الجلسة (للتأكد من الجلسة الحالية)
+
+# -------------------------------
+# نموذج لإرسال تقييم / ملاحظات
+class FeedbackRequest(BaseModel):
+    message_id: int             # معرف الرسالة التي يتم تقييمها
+    rating: int                 # التقييم من 1 إلى 5
+    comment: Optional[str] = None  # تعليق اختياري
+
+الكود التالي تبع utils.py
+# app/utils.py
+# استدعاء حقيقي لنموذج Gemini باستخدام مكتبة google-genai
+# المفتاح مدمج هنا للتجربة (يمكن استبداله بمتغير بيئة لأمان أكثر).
+
+import os
+
+# ---------- إعدادات ----------
+API_KEY = "AIzaSyBboZ9q_BqfWB1yCGKSim9Fm9Au_NB6XKw"  # ← لصق مفتاحك هنا
+
+# --- system prompt بالعربي (يبقى هو الحامي الرئيسي) ---
+SYSTEM_PROMPT = """
+أنت مساعد تعليمي طبي مخصص لطلاب المادة. أجب فقط على الأسئلة المتعلقة بالطب (تشريح، فسيولوجي، أمراض، علاج أساسي، تشخيص سريري تعليمي).
+إذا السؤال خارج نطاق الطب، أجب: "أستطيع الإجابة فقط على الأسئلة الطبية المتعلقة بالمقرر؛ رجاءً عدّل سؤالك ضمن الطب."
+لا تعط وصفات صريحة أو نصائح طبية طارئة. إذا يبدو أنه حالة طارئة، قل: "هذه تبدو حالة طارئة؛ يرجى الاتصال بخدمات الطوارئ".
+"""
+
+def mock_gemini_response(user_message: str) -> str:
+    """رد احتياطي فقط إذا لم يتم ضبط المفتاح."""
+    return ("[رد احتياطي] لم يتم تفعيل Gemini الحقيقي. "
+            "أعد ضبط GEMINI_API_KEY أو الصق المفتاح داخل الكود.\n\n"
+            + (user_message[:200] if user_message else ""))
+
+# ----------------------------------------------------------------------
+
+def call_gemini(user_message: str, system_prompt: str = SYSTEM_PROMPT) -> str:
+    """استدعاء Gemini للرد على رسالة المستخدم."""
+    api_key = API_KEY
+    if not api_key:
+        return "[خطأ: لم يتم ضبط المفتاح داخل utils.py]"
+
+    try:
+        from google import genai
+        client = genai.Client(api_key=api_key)
+
+        # بناء prompt
+        prompt = f"{system_prompt}\n\nUser: {user_message}"
+
+        # استدعاء النموذج
+        # model_name = "gemini-2.5-flash"
+        model_name = "gemini-2.5-flash"
+        response = client.models.generate_content(
+            model=model_name,
+            contents=prompt
+        )
+
+        # استخراج النص من الاستجابة
+        if hasattr(response, "text") and response.text:
+            return response.text.strip()
+        elif hasattr(response, "candidates") and response.candidates:
+            parts = []
+            for cand in response.candidates:
+                if hasattr(cand, "content"):
+                    parts.append(str(cand.content))
+            return "\n".join(parts).strip()
+        else:
+            return str(response)
+
+    except Exception as e:
+        return f"[خطأ في استدعاء Gemini] {str(e)}"
+الكود التالي تبع index.html
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>شات بوت طبي - الجامعة</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>شات بوت طبي تفاعلي</h1>
+      <p class="notice">ملاحظة: هذا النظام مساعد تعليمي فقط ولا يغني عن الاستشارة الطبية الحقيقية.</p>
+    </header>
+
+    <div id="chatbox" class="chatbox"></div>
+
+    <div class="controls">
+      <input id="inputMsg" placeholder="اكتب سؤالك الطبي هنا..." autocomplete="off"/>
+      <button id="sendBtn">إرسال</button>
+    </div>
+
+    <div class="session-controls">
+      <button id="newSession">جلسة جديدة</button>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
+
+الكود التالي تبع style.css
+
+body {
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  direction: rtl;
+  background: #f6f9fc;
+  color: #222;
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  max-width: 700px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+header h1 {
+  margin: 0 0 5px 0;
+  font-size: 28px;
+  color: #0b4;
+}
+
+.notice {
+  color: #a33;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.chatbox {
+  height: 450px;
+  overflow-y: auto;
+  border: 1px solid #e3e3e3;
+  padding: 15px;
+  background: #fdfdfd;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg-user, .msg-bot {
+  max-width: 80%;
+  padding: 10px 15px;
+  border-radius: 15px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  animation: fadeIn 0.2s ease;
+}
+
+.msg-user {
+  align-self: flex-end;
+  background: #dcf8c6;
+  text-align: right;
+}
+
+.msg-bot {
+  align-self: flex-start;
+  background: #e6e6e6;
+  text-align: left;
+  color: #222;
+  position: relative;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+#inputMsg {
+  flex: 1;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+#sendBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #0b4;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#sendBtn:hover {
+  background: #097a0d;
+}
+
+.session-controls {
+  margin-top: 10px;
+  text-align: center;
+}
+
+#newSession {
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#newSession:hover {
+  background: #c12b20;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+الكود التالي تبع  app.js
+let currentSessionId = null;
+const chatbox = document.getElementById("chatbox");
+const inputMsg = document.getElementById("inputMsg");
+
+// مثال ثابت للـ user_id
+const USER_ID = "user1";
+
+function appendMessage(sender, text, isPartial=false) {
+  let div = document.createElement("div");
+  div.className = sender === "user" ? "msg-user" : "msg-bot";
+  div.innerText = (sender === "user" ? "أنت: " : "بوت: ") + text;
+  if (isPartial) div.id = "partial-bot-msg";
+  chatbox.appendChild(div);
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+function updatePartialBotMessage(text) {
+  let div = document.getElementById("partial-bot-msg");
+  if (div) div.innerText = "بوت: " + text;
+}
+
+async function sendMessage(text) {
+  appendMessage("user", text);
+
+  let payload = { 
+    user_id: USER_ID,          // أضفنا هذا
+    message: text, 
+    session_id: currentSessionId 
+  };
+
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    appendMessage("bot", "حدث خطأ: " + (err.detail || res.statusText));
+    return;
+  }
+
+  const data = await res.json();
+  currentSessionId = data.session_id;
+
+  // عرض الرد تدريجيًا (fake streaming effect)
+  let reply = data.reply;
+  let index = 0;
+  let partial = "";
+  let interval = setInterval(() => {
+    if (index < reply.length) {
+      partial += reply[index];
+      updatePartialBotMessage(partial);
+      index++;
+    } else {
+      clearInterval(interval);
+      // إزالة id الجزئي بعد انتهاء الكتابة
+      let div = document.getElementById("partial-bot-msg");
+      if (div) div.removeAttribute("id");
+    }
+  }, 20); // سرعة الكتابة
+}
+
+document.getElementById("sendBtn").addEventListener("click", () => {
+  const text = inputMsg.value.trim();
+  if (!text) return;
+  inputMsg.value = "";
+  sendMessage(text);
+});
+
+inputMsg.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") document.getElementById("sendBtn").click();
+});
+
+document.getElementById("newSession").addEventListener("click", () => {
+  currentSessionId = null;
+  chatbox.innerHTML = "";
+  appendMessage("bot", "تم إنشاء جلسة جديدة — اطرح سؤالك الطبي.");
+});
+
+الان اسمعني عدل على التعارضات من التسميات في المتغيبرات و الدوال و السارات المهم رجع الكود يشتغل مثل كان سابقا 
+
