@@ -5,7 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🩺 المساعد الطبي الذكي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+    <!-- مكتبة marked.js من CDN -->
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
@@ -81,7 +84,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background:
                 radial-gradient(circle at 20% 80%, rgba(0, 184, 148, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(116, 185, 255, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(162, 155, 254, 0.15) 0%, transparent 50%);
@@ -91,20 +94,43 @@
         }
 
         @keyframes gradientFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         @keyframes medicalFloat {
-            0% { transform: translateX(0) translateY(0); }
-            100% { transform: translateX(-40px) translateY(-40px); }
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+
+            100% {
+                transform: translateX(-40px) translateY(-40px);
+            }
         }
 
         @keyframes particleFloat {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-30px) rotate(120deg); }
-            66% { transform: translateY(15px) rotate(240deg); }
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            33% {
+                transform: translateY(-30px) rotate(120deg);
+            }
+
+            66% {
+                transform: translateY(15px) rotate(240deg);
+            }
         }
 
         .app-container {
@@ -176,18 +202,33 @@
         }
 
         @keyframes medicalHeaderFloat {
-            0% { transform: translateX(0) translateY(0) rotate(0deg); }
-            100% { transform: translateX(-20px) translateY(-20px) rotate(360deg); }
+            0% {
+                transform: translateX(0) translateY(0) rotate(0deg);
+            }
+
+            100% {
+                transform: translateX(-20px) translateY(-20px) rotate(360deg);
+            }
         }
 
         @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         @keyframes float {
-            0% { transform: translateX(0) translateY(0); }
-            100% { transform: translateX(-20px) translateY(-20px); }
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+
+            100% {
+                transform: translateX(-20px) translateY(-20px);
+            }
         }
 
         /* Floating Medical Particles */
@@ -205,8 +246,13 @@
         }
 
         @keyframes particlesDrift {
-            0% { transform: translateX(0) translateY(0); }
-            100% { transform: translateX(-200px) translateY(-200px); }
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+
+            100% {
+                transform: translateX(-200px) translateY(-200px);
+            }
         }
 
         .logo-section {
@@ -245,13 +291,25 @@
         }
 
         @keyframes logoFloat {
-            0%, 100% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(-8px) scale(1.05); }
+
+            0%,
+            100% {
+                transform: translateY(0px) scale(1);
+            }
+
+            50% {
+                transform: translateY(-8px) scale(1.05);
+            }
         }
 
         @keyframes logoRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .sidebar-title {
@@ -537,8 +595,13 @@
         }
 
         @keyframes headerShimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         .header-info {
@@ -591,18 +654,37 @@
         }
 
         @keyframes avatarPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         @keyframes avatarRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes statusBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         .header-text h1 {
@@ -641,7 +723,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 radial-gradient(circle at 10% 20%, rgba(0, 184, 148, 0.03) 0%, transparent 50%),
                 radial-gradient(circle at 90% 80%, rgba(116, 185, 255, 0.03) 0%, transparent 50%);
             pointer-events: none;
@@ -649,8 +731,15 @@
         }
 
         @keyframes feedFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         .message {
@@ -664,6 +753,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -967,9 +1057,13 @@
         }
 
         @keyframes typingBounce {
-            0%, 60%, 100% {
+
+            0%,
+            60%,
+            100% {
                 transform: translateY(0);
             }
+
             30% {
                 transform: translateY(-10px);
             }
@@ -977,31 +1071,37 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .app-container {
+                display: flex;
+                flex-direction: column;
+                /* لضبط المحتوى عموديًا على الهاتف */
+            }
+
             .sidebar {
                 position: fixed;
                 top: 0;
-                right: 0;
+                left: 0;
+                /* بدل right:0 لتظهر من اليسار */
+                width: 80%;
+                /* أو 100% حسب الحاجة */
                 height: 100vh;
                 z-index: 1000;
-                transform: translateX(100%);
+                transform: translateX(-100%);
+                /* مخفية افتراضياً */
+                transition: transform 0.3s ease;
             }
 
-            .sidebar:not(.hidden) {
+            .sidebar.show {
                 transform: translateX(0);
             }
 
-            .chat-feed {
-                padding: 20px;
-            }
-
-            .input-section {
-                padding: 16px 20px;
-            }
-
-            .message {
-                max-width: 85%;
+            .main-content {
+                flex: 1;
+                margin-left: 0;
+                border-radius: 0;
             }
         }
+
 
         /* Scrollbar Styling */
         .sessions-container::-webkit-scrollbar,
@@ -1100,9 +1200,8 @@
             <div class="input-section">
                 <div class="input-container">
                     <div class="input-wrapper">
-                        <textarea class="input-msg" id="inputMsg" 
-                            placeholder="اكتب سؤالك الطبي هنا... (Shift+Enter لسطر جديد)" 
-                            rows="1"></textarea>
+                        <textarea class="input-msg" id="inputMsg"
+                            placeholder="اكتب سؤالك الطبي هنا... (Shift+Enter لسطر جديد)" rows="1"></textarea>
                     </div>
                     <button class="send-btn" id="sendBtn" title="إرسال الرسالة">
                         <i class="fas fa-paper-plane"></i>
@@ -1146,15 +1245,20 @@
                 catch (e) { console.warn(e); return {}; }
             }
             function saveSessions() { localStorage.setItem(SESS_KEY, JSON.stringify(sessions)); }
-
-            // ---- تنسيقات HTML ----
             function escapeHtml(s) {
                 return s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
             }
-           function formatToHtml(text) {
+            function formatToHtml(text) {
                 if (!text) return "";
-                return text; // اسمح بعرض HTML جاهز من السيرفر
+                let html = escapeHtml(text);
+                html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+                html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+                html = html.replace(/\r?\n/g, "<br>");
+                html = html.replace(/(?:<br>){0,1}(-|•)\s?(.*?)((<br>|$))/g, "<ul><li>$2</li></ul>");
+                return html;
             }
+
+
 
 
 
@@ -1173,16 +1277,35 @@
                 step();
             }
             // ---- typing effect ----
-            function typeWrite(element, html, speed = 20, onDone) {
+            function tokenizeHTML(html) {
+                const re = /(<[^>]+>|[^<]+)/g;
+                let tokens = [], m;
+                while ((m = re.exec(html)) !== null) tokens.push(m[0]);
+                return tokens;
+            }
+            function typeWrite(element, html, speed = 16, onDone) {
                 element.innerHTML = "";
-                let i = 0;
+                const tokens = tokenizeHTML(html);
+                let ti = 0, ci = 0;
                 function step() {
-                    if (i < html.length) {
-                        element.innerHTML += html.charAt(i);
-                        i++;
+                    if (ti >= tokens.length) { if (onDone) onDone(); return; }
+                    const token = tokens[ti];
+                    if (token.startsWith("<")) {
+                        element.innerHTML += token;
+                        ti++; ci = 0;
                         if (!userScrolledAway) chatFeed.scrollTop = chatFeed.scrollHeight;
                         setTimeout(step, speed);
-                    } else if (onDone) onDone();
+                    } else {
+                        if (ci < token.length) {
+                            element.innerHTML += token.charAt(ci);
+                            ci++;
+                            if (!userScrolledAway) chatFeed.scrollTop = chatFeed.scrollHeight;
+                            setTimeout(step, speed);
+                        } else {
+                            ti++; ci = 0;
+                            setTimeout(step, speed);
+                        }
+                    }
                 }
                 step();
             }
@@ -1202,9 +1325,9 @@
 
                 const timeDiv = document.createElement("div");
                 timeDiv.className = "message-time";
-                timeDiv.textContent = new Date().toLocaleTimeString('ar-EG', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
+                timeDiv.textContent = new Date().toLocaleTimeString('ar-EG', {
+                    hour: '2-digit',
+                    minute: '2-digit'
                 });
 
                 const html = formatToHtml(textPlain);
@@ -1258,11 +1381,11 @@
                 chatFeed.appendChild(wrapper);
 
                 const atBottom = chatFeed.scrollTop + chatFeed.clientHeight >= chatFeed.scrollHeight - 100;
-                if (atBottom) { 
-                    chatFeed.scrollTop = chatFeed.scrollHeight; 
-                    hideJump(); 
-                } else { 
-                    showJump(); 
+                if (atBottom) {
+                    chatFeed.scrollTop = chatFeed.scrollHeight;
+                    hideJump();
+                } else {
+                    showJump();
                 }
 
                 return wrapper;
@@ -1297,7 +1420,7 @@
             function rebuildSessionsList(filter = "") {
                 sessionsList.innerHTML = "";
                 const arr = Object.values(sessions).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                
+
                 let filteredSessions = arr;
                 if (filter) {
                     filteredSessions = arr.filter(s => {
@@ -1312,11 +1435,11 @@
                     const title = s.name && s.name.trim() ? s.name : (s.messages && s.messages[0] ? excerpt(s.messages[0].content, 35) : "محادثة جديدة");
                     const lastMessage = s.messages && s.messages.length > 0 ? s.messages[s.messages.length - 1] : null;
                     const preview = lastMessage ? excerpt(lastMessage.content, 60) : "لا توجد رسائل";
-                    
+
                     const el = document.createElement("div");
                     el.className = "session-item";
                     if (s.id === currentSessionId) el.classList.add("active");
-                    
+
                     el.innerHTML = `
                         <div class="session-header">
                             <div class="session-title">${escapeHtml(title)}</div>
@@ -1346,19 +1469,19 @@
                     const deleteBtn = el.querySelector('.session-btn.delete');
 
                     openBtn.onclick = (e) => { e.stopPropagation(); openSession(s.id); };
-                    deleteBtn.onclick = (e) => { 
-                        e.stopPropagation(); 
-                        if (confirm("هل تريد حذف هذه المحادثة؟")) { 
-                            delete sessions[s.id]; 
-                            saveSessions(); 
-                            rebuildSessionsList(searchSessions.value); 
-                            if (s.id === currentSessionId) { 
-                                currentSessionId = null; 
-                                clearChat(); 
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (confirm("هل تريد حذف هذه المحادثة؟")) {
+                            delete sessions[s.id];
+                            saveSessions();
+                            rebuildSessionsList(searchSessions.value);
+                            if (s.id === currentSessionId) {
+                                currentSessionId = null;
+                                clearChat();
                                 chatTitle.textContent = "المساعد الطبي الذكي";
                                 chatSubtitle.textContent = "جاهز للإجابة على استفساراتك الطبية";
-                            } 
-                        } 
+                            }
+                        }
                     };
 
                     el.onclick = () => openSession(s.id);
@@ -1376,11 +1499,11 @@
                 currentSessionId = String(sessionId);
                 const s = sessions[currentSessionId];
                 if (!s) return;
-                
+
                 const title = s.name && s.name.trim() ? s.name : "محادثة طبية";
                 chatTitle.textContent = title;
                 chatSubtitle.textContent = `بدأت في ${new Date(s.created_at).toLocaleDateString('ar-EG')}`;
-                
+
                 clearChat();
                 if (s.messages) {
                     s.messages.forEach(m => {
@@ -1394,95 +1517,95 @@
 
             function createNewSession() {
                 const id = String(Date.now());
-                sessions[id] = { 
-                    id, 
-                    name: "", 
-                    created_at: new Date().toISOString(), 
-                    messages: [] 
+                sessions[id] = {
+                    id,
+                    name: "",
+                    created_at: new Date().toISOString(),
+                    messages: []
                 };
-                saveSessions(); 
+                saveSessions();
                 rebuildSessionsList();
                 openSession(id);
             }
 
             function saveLocalMessage(sessionId, sender, content, serverMessageId = null) {
                 if (!sessions[sessionId]) {
-                    sessions[sessionId] = { 
-                        id: sessionId, 
-                        name: "", 
-                        created_at: new Date().toISOString(), 
-                        messages: [] 
+                    sessions[sessionId] = {
+                        id: sessionId,
+                        name: "",
+                        created_at: new Date().toISOString(),
+                        messages: []
                     };
                 }
-                
+
                 const localId = serverMessageId || String(Date.now()) + Math.floor(Math.random() * 1000);
-                const msgObj = { 
-                    local_id: localId, 
-                    sender, 
-                    content, 
-                    created_at: new Date().toISOString() 
+                const msgObj = {
+                    local_id: localId,
+                    sender,
+                    content,
+                    created_at: new Date().toISOString()
                 };
-                
+
                 const isFirst = !sessions[sessionId].messages || sessions[sessionId].messages.length === 0;
-                        if (isFirst && (!sessions[sessionId].name || sessions[sessionId].name === "")) {
-                      sessions[sessionId].name = excerpt(content, 40);
-                    }
+                if (isFirst && (!sessions[sessionId].name || sessions[sessionId].name === "")) {
+                    sessions[sessionId].name = excerpt(content, 40);
+                }
 
                 sessions[sessionId].messages.push(msgObj);
-                saveSessions(); 
+                saveSessions();
                 rebuildSessionsList(searchSessions.value);
                 return msgObj;
             }
 
             async function sendMessage() {
-    const text = inputMsg.value.trim();
-    if (!text) return;
+                const text = inputMsg.value.trim();
+                if (!text) return;
 
-    // إنشاء جلسة جديدة إذا لم توجد جلسة حالية
-    if (!currentSessionId) createNewSession();
+                // إنشاء جلسة جديدة إذا لم توجد جلسة حالية
+                if (!currentSessionId) createNewSession();
 
-    // حفظ رسالة المستخدم محلياً وعرضها
-    const localMsg = saveLocalMessage(currentSessionId, "user", text);
-    appendBubble("user", text, { typing: false, id: localMsg.local_id });
-    inputMsg.value = ""; 
-    inputMsg.style.height = "auto";
+                // حفظ رسالة المستخدم محلياً وعرضها
+                const localMsg = saveLocalMessage(currentSessionId, "user", text);
+                appendBubble("user", text, { typing: false, id: localMsg.local_id });
+                inputMsg.value = "";
+                inputMsg.style.height = "auto";
 
-    // فقرة مؤقتة للكتابة
-    const placeholder = appendBubble("bot", "", { typing: true, id: "ph_" + Date.now() });
+                // فقرة مؤقتة للكتابة
+                const placeholder = appendBubble("bot", "", { typing: true, id: "ph_" + Date.now() });
 
-    try {
-        // إرسال الرسالة للباك اند
-        const response = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                session_id: currentSessionId,
-                message: text
-            })
-        });
+                try {
+                    // إرسال الرسالة للباك اند
+                    const response = await fetch("/api/chat", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            session_id: currentSessionId,
+                            message: text
+                        })
+                    });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
 
-        const data = await response.json();
+                    const data = await response.json();
 
-        // إزالة فقرة الكتابة المؤقتة
-        placeholder.remove();
+                    // إزالة فقرة الكتابة المؤقتة
+                    placeholder.remove();
 
-        // استخدم الحقل الصحيح من رد السيرفر
-        const botResponse = data.reply || "عذراً، حدث خطأ في الاستجابة.";
-        const saved = saveLocalMessage(currentSessionId, "bot", botResponse);
-        appendBubble("bot", botResponse, { typing: true, id: saved.local_id });
+                    // استخدم الحقل الصحيح من رد السيرفر
+                    const botResponse = data.reply || "عذراً، حدث خطأ في الاستجابة.";
+                    const saved = saveLocalMessage(currentSessionId, "bot", botResponse);
+                    appendBubble("bot", botResponse, { typing: true, id: saved.local_id });
 
-    }   catch (error) {
-        console.error("Error sending message:", error);
-        placeholder.remove();
-        const errorResponse = "عذراً، حدث خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.";
-        const saved = saveLocalMessage(currentSessionId, "bot", errorResponse);
-        appendBubble("bot", errorResponse, { typing: true, id: saved.local_id });
-    }
-}
+                } catch (error) {
+                    console.error("Error sending message:", error);
+                    placeholder.remove();
+                    const errorResponse = "عذراً، حدث خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.";
+                    const saved = saveLocalMessage(currentSessionId, "bot", errorResponse);
+                    appendBubble("bot", errorResponse, { typing: true, id: saved.local_id });
+                }
+            }
 
 
             function generateMedicalResponse(userMessage) {
@@ -1499,9 +1622,9 @@
             // ---- events ----
             sendBtn.addEventListener("click", sendMessage);
             inputMsg.addEventListener("keydown", e => {
-                if (e.key === "Enter" && !e.shiftKey) { 
-                    e.preventDefault(); 
-                    sendMessage(); 
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
                 }
             });
 
@@ -1510,9 +1633,9 @@
             btnToggleSidebar.addEventListener("click", () => sidebar.classList.toggle("hidden"));
             btnShareSession.addEventListener("click", shareCurrentSession);
 
-            jumpBtn.addEventListener("click", () => { 
-                chatFeed.scrollTop = chatFeed.scrollHeight; 
-                hideJump(); 
+            jumpBtn.addEventListener("click", () => {
+                chatFeed.scrollTop = chatFeed.scrollHeight;
+                hideJump();
             });
 
             chatFeed.addEventListener("scroll", () => {
@@ -1543,7 +1666,7 @@
                 const next = cur === "light" ? "dark" : "light";
                 document.documentElement.setAttribute("data-theme", next);
                 const themeIcon = btnToggleTheme.querySelector('i');
-                
+
                 if (next === "dark") {
                     document.documentElement.classList.add("dark");
                     themeIcon.className = "fas fa-sun";
@@ -1558,19 +1681,19 @@
                 if (!currentSessionId || !sessions[currentSessionId]) {
                     return alert("يرجى فتح محادثة للمشاركة");
                 }
-                
+
                 const s = sessions[currentSessionId];
                 const title = s.name || "محادثة طبية";
                 let text = `📋 ${title}\n`;
                 text += `📅 ${new Date(s.created_at).toLocaleDateString('ar-EG')}\n\n`;
-                
+
                 if (s.messages) {
                     s.messages.forEach(m => {
                         const icon = m.sender === "user" ? "👤" : "🩺";
                         text += `${icon} ${m.content}\n\n`;
                     });
                 }
-                
+
                 navigator.clipboard?.writeText(text)
                     .then(() => alert("تم نسخ المحادثة بنجاح!"))
                     .catch(() => prompt("انسخ المحادثة يدوياً:", text));
@@ -1581,7 +1704,7 @@
                 sessions = loadSessions();
                 loadTheme();
                 rebuildSessionsList();
-                
+
                 // إنشاء جلسة جديدة إذا لم توجد جلسات
                 if (Object.keys(sessions).length === 0) {
                     createNewSession();
@@ -1592,6 +1715,7 @@
             init();
         })();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97b90c1a4507d1e8',t:'MTc1NzI3NzkwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'97b90c1a4507d1e8',t:'MTc1NzI3NzkwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
 
 </html>

@@ -46,13 +46,30 @@
         return s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
     }
     function formatToHtml(text) {
-        if (!text) return "";
-        let html = escapeHtml(text);
-        html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-        html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-        html = html.replace(/\r?\n/g, "<br>");
-        return html;
-    }
+    let html = escapeHtml(text);
+
+    // نص عادي (بولد أو مائل)
+    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+
+    // تقسيم الفقرات
+    let paragraphs = html.split(/\n\s*\n/).map(p => `<p>${p}</p>`).join("");
+
+    // تحويل النقاط أو الشرطات لقوائم داخل الفقرة
+    paragraphs = paragraphs.replace(/<p>([\s\S]*?)<\/p>/g, (match, content) => {
+        if (/(-|\*|\d+\.)\s/.test(content)) {
+            // استبدال العناصر داخل الفقرة بقائمة
+            let items = content.split(/\n/).map(line => {
+                let m = line.match(/(?:-|\*|\d+\.)\s?(.*)/);
+                return m ? `<li>${m[1]}</li>` : line;
+            }).join("");
+            return `<ul>${items}</ul>`;
+        }
+        return `<p>${content}</p>`;
+    });
+
+    return paragraphs;
+}
 
     // ---- typing effect ----
     function typeWrite(element, html, speed = 20, onDone) {
